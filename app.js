@@ -28,9 +28,29 @@ const state = {
       period: '04.01 ~ 04.03 (3일)',
       skills: ['외국어 가능', '고객 응대'],
       region: '경주'
+    },
+    {
+      id: 'mock-job-pre-2',
+      title: '경주 도자기 축제 체험 지도 조교',
+      company: '경주도예협회 · 경주시',
+      icon: '🏺',
+      pay: 95000,
+      period: '05.15 ~ 05.18 (3일)',
+      skills: ['고객 응대', '안내·접수'],
+      region: '경주'
+    },
+    {
+      id: 'mock-job-pre-3',
+      title: '강릉 커피축제 바리스타 보조',
+      company: '강릉커피협회 · 강릉시',
+      icon: '☕',
+      pay: 90000,
+      period: '09.05 ~ 09.08 (3일)',
+      skills: ['카페 운영', '고객 서비스'],
+      region: '강릉'
     }
   ],
-  seekerBadges: ['외국어 가능', '고객 응대'],
+  seekerBadges: ['외국어 가능', '고객 응대', '안내·접수', '카페 운영', '고객 서비스'],
   userRole: 'tourist',
   jobs: [
     {
@@ -1055,7 +1075,7 @@ function renderSeekerMypage() {
       jobList.innerHTML = state.completedJobs.map(job => {
         return `
           <div class="seeker-job-card">
-            <div style="font-size: 24px;">🏛️</div>
+            <div style="font-size: 24px;">${job.icon || '🏛️'}</div>
             <div>
               <h4 style="font-size: 13px; font-weight:700; color:var(--text-main); margin-bottom:2px;">${job.title}</h4>
               <p style="font-size: 11px; color:var(--text-sub);">${job.company} · 완료</p>
