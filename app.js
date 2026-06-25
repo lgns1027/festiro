@@ -18,6 +18,7 @@ const state = {
 // ── Screen Labels ────────────────────────────────────────
 const screenLabels = {
   'screen-splash':        '스플래시 화면',
+  'screen-onboarding':    '온보딩 슬라이드',
   'screen-category':      '1단계 — 활동 카테고리 선택',
   'screen-conditions':    '2단계 — 여행 조건 설정',
   'screen-analyzing':     'AI 분석 중...',
@@ -63,6 +64,13 @@ function goto(screenId, direction = 'right') {
   setTimeout(() => {
     next.classList.remove('slide-in-right', 'slide-in-left');
   }, 400);
+
+  // Show toast warning if entering course screen for Busan
+  if (screenId === 'screen-course' && state.selectedFestival === '부산 불꽃 축제') {
+    setTimeout(() => {
+      showToast('⚠️ 부산 코스는 준비 중으로, 경주 코스 예시가 표시됩니다.', 'warning');
+    }, 450);
+  }
 }
 
 // ── Category Selection ───────────────────────────────────
@@ -98,7 +106,10 @@ function selectFestival(el, name) {
   showToast(`'${name}' 선택! 코스를 생성합니다 ✨`, 'success');
 }
 
-// ── AI Analysis Flow (with spinner) ─────────────────────
+// ── AI Analysis Flow (with spinner & cancel) ─────────────
+let aiAnalysisTimeout = null;
+let aiAnalysisInterval = null;
+
 function startAIAnalysis() {
   goto('screen-analyzing', 'right');
   const texts = [
@@ -108,15 +119,24 @@ function startAIAnalysis() {
   ];
   let i = 0;
   const el = document.getElementById('spinner-text');
-  const interval = setInterval(() => {
+  if (el) el.innerHTML = texts[0].replace('\n', '<br/>');
+
+  aiAnalysisInterval = setInterval(() => {
     i++;
-    if (i < texts.length) { el.innerHTML = texts[i].replace('\n','<br/>'); }
+    if (i < texts.length && el) { el.innerHTML = texts[i].replace('\n','<br/>'); }
   }, 700);
 
-  setTimeout(() => {
-    clearInterval(interval);
+  aiAnalysisTimeout = setTimeout(() => {
+    clearInterval(aiAnalysisInterval);
     goto('screen-festival-list', 'right');
   }, 2200);
+}
+
+function cancelAIAnalysis() {
+  if (aiAnalysisTimeout) clearTimeout(aiAnalysisTimeout);
+  if (aiAnalysisInterval) clearInterval(aiAnalysisInterval);
+  showToast('AI 분석이 취소되었습니다', 'warning');
+  goto('screen-conditions', 'left');
 }
 
 // ── Day Tab Switch ───────────────────────────────────────
@@ -185,7 +205,7 @@ function simulateArrival() {
   // Update nav screen distance/time
   const distEl = document.getElementById('nav-dist');
   const timeEl = document.getElementById('nav-time');
-  if (distEl && state.gpsStep === 2) {
+  if (distEl && timeEl) {
     distEl.textContent = '0m';
     timeEl.textContent = '도착!';
   }
@@ -208,7 +228,9 @@ function completeMission(num) {
   item.classList.remove('active');
   item.classList.add('done');
   const action = item.querySelector('.mission-action');
-  action.innerHTML = '<div class="mission-done-badge">✅ 인증 완료!</div>';
+  if (action) {
+    action.innerHTML = '<div class="mission-done-badge">✅ 인증 완료!</div>';
+  }
 
   missionsDone++;
   const pct = Math.round((missionsDone / 4) * 100);
@@ -241,6 +263,86 @@ function completeMission(num) {
     gpsDots[num - 1].classList.remove('active');
     gpsDots[num - 1].classList.add('done');
     if (gpsDots[num]) gpsDots[num].classList.add('active');
+  }
+
+  // Progress GPS step & update navigation UI
+  if (num === 3) {
+    state.gpsStep = 3; // Now active spot is 동궁과 월지 (index 3)
+
+    // Update navigation UI
+    const pin3 = document.getElementById('pin3-dot');
+    if (pin3) {
+      pin3.className = 'pin-dot done';
+      pin3.textContent = '✓';
+    }
+
+    const pin4 = document.getElementById('pin4-dot');
+    if (pin4) {
+      pin4.className = 'pin-dot active';
+      pin4.style.background = 'var(--primary)';
+    }
+
+    const routeTitle = document.getElementById('nav-route-title');
+    if (routeTitle) routeTitle.textContent = '🧭 첨성대 → 동궁과 월지';
+
+    const routeDesc = document.getElementById('nav-route-desc');
+    if (routeDesc) routeDesc.textContent = '도보 약 12분 · 남동쪽 방향으로 이동';
+
+    const distEl = document.getElementById('nav-dist');
+    const timeEl = document.getElementById('nav-time');
+    if (distEl) distEl.textContent = '540m';
+    if (timeEl) timeEl.textContent = '7분';
+
+    const progressNum = document.getElementById('nav-progress-num');
+    if (progressNum) progressNum.textContent = '3/4';
+
+    const nextIcon = document.getElementById('nav-next-icon');
+    if (nextIcon) nextIcon.textContent = '🌙';
+
+    const nextInfo = document.getElementById('nav-next-info');
+    if (nextInfo) {
+      nextInfo.innerHTML = `
+        <h4>다음 거점 : 동궁과 월지</h4>
+        <p>야간 특별 투어 및 야경 인증 미션 가능</p>
+      `;
+    }
+
+    // Update nav progress dots
+    const progressTrack = document.getElementById('nav-progress-track');
+    if (progressTrack) {
+      const dots = progressTrack.children;
+      if (dots && dots[2] && dots[3]) {
+        dots[2].className = 'nav-progress-dot done';
+        dots[3].className = 'nav-progress-dot active';
+      }
+    }
+  }
+
+  if (num === 4) {
+    state.gpsStep = 4; // All steps done
+
+    const progressNum = document.getElementById('nav-progress-num');
+    if (progressNum) progressNum.textContent = '4/4';
+
+    const progressTrack = document.getElementById('nav-progress-track');
+    if (progressTrack) {
+      const dots = progressTrack.children;
+      if (dots && dots[3]) {
+        dots[3].className = 'nav-progress-dot done';
+      }
+    }
+
+    const pin4 = document.getElementById('pin4-dot');
+    if (pin4) {
+      pin4.className = 'pin-dot done';
+      pin4.textContent = '✓';
+    }
+
+    // Auto trigger course complete after 1.5s
+    setTimeout(() => {
+      showToast('🎉 경주 신라문화제 코스 완주를 축하합니다!', 'success');
+      triggerCourseComplete();
+    }, 1500);
   }
 
   // Sharpen docent mascot
@@ -350,3 +452,164 @@ document.addEventListener('DOMContentLoaded', () => {
   const label = document.getElementById('current-screen-label');
   if (label) label.textContent = screenLabels['screen-splash'];
 });
+
+// ── Onboarding Slide Control ─────────────────────────────
+let currentOnboardSlide = 0;
+
+function nextOnboardSlide() {
+  if (currentOnboardSlide < 2) {
+    gotoOnboardSlide(currentOnboardSlide + 1);
+  } else {
+    goto('screen-category', 'right');
+  }
+}
+
+function gotoOnboardSlide(index) {
+  currentOnboardSlide = index;
+  document.querySelectorAll('.onboard-slide').forEach(s => s.classList.remove('active'));
+  const activeSlide = document.querySelector(`.onboard-slide[data-index="${index}"]`);
+  if (activeSlide) activeSlide.classList.add('active');
+  
+  document.querySelectorAll('.onboard-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === index);
+  });
+
+  const btn = document.getElementById('onboard-next-btn');
+  if (btn) {
+    if (index === 2) {
+      btn.textContent = '카테고리 선택하고 시작하기 →';
+    } else {
+      btn.textContent = '다음 단계로 →';
+    }
+  }
+}
+
+// ── Region Confirmation Ticket Modal Control ─────────────
+function openRegionConfirmModal() {
+  const modal = document.getElementById('region-confirm-modal');
+  if (!modal) return;
+  
+  const festVal = state.selectedFestival || '신라문화제';
+  const nameEl = document.getElementById('ticket-festival-name');
+  if (nameEl) nameEl.textContent = festVal;
+  
+  modal.classList.add('active');
+}
+
+function closeRegionConfirmModal() {
+  const modal = document.getElementById('region-confirm-modal');
+  if (modal) modal.classList.remove('active');
+}
+
+function confirmRegionGo() {
+  closeRegionConfirmModal();
+
+  const festVal = state.selectedFestival || '신라문화제';
+  
+  // DOM element references
+  const heroImg = document.getElementById('region-hero-img');
+  const tagContainer = document.getElementById('region-tag-container');
+  const title = document.getElementById('region-title');
+  const desc = document.getElementById('region-desc');
+  const statMatch = document.getElementById('region-stat-match');
+  const statDuration = document.getElementById('region-stat-duration');
+  const statSpots = document.getElementById('region-stat-spots');
+  const mascotCard = document.getElementById('region-mascot-card');
+
+  if (festVal === '신라문화제') {
+    if (heroImg) {
+      heroImg.src = 'assets/cheomseongdae.png';
+      heroImg.style.background = '';
+    }
+    if (tagContainer) {
+      tagContainer.innerHTML = `
+        <span class="badge orange">📍 경주시, 경북</span>
+        <span class="badge blue">신라문화제 10월</span>
+      `;
+    }
+    if (title) title.textContent = '경주로 떠나요! 🏯';
+    if (desc) desc.textContent = 'AI가 선택한 최적의 여행지 — 매칭률 96%';
+    if (statMatch) statMatch.textContent = '96%';
+    if (statDuration) statDuration.textContent = '2박 3일';
+    if (statSpots) statSpots.textContent = '12곳';
+    
+    if (mascotCard) {
+      mascotCard.style.display = 'flex';
+      const img = mascotCard.querySelector('img');
+      if (img) img.style.filter = '';
+      const textH3 = mascotCard.querySelector('.mascot-text h3');
+      const textP = mascotCard.querySelector('.mascot-text p');
+      if (textH3) textH3.textContent = '🦁 도슨트 \'신라방\' 등장!';
+      if (textP) textP.textContent = '경주의 수호자 신라방이 여러분의 여행을 함께합니다. 미션을 완료할수록 캐릭터가 점점 선명해져요!';
+    }
+  } else if (festVal === '경주 벚꽃 축제') {
+    if (heroImg) {
+      heroImg.src = 'assets/cheomseongdae.png';
+      heroImg.style.background = 'linear-gradient(135deg, #FFB6C1 0%, #FFC0CB 100%)';
+    }
+    if (tagContainer) {
+      tagContainer.innerHTML = `
+        <span class="badge orange">📍 경주시, 경북</span>
+        <span class="badge green">경주 벚꽃 축제 3~4월</span>
+      `;
+    }
+    if (title) title.textContent = '경주로 떠나요! 🌸';
+    if (desc) desc.textContent = 'AI가 선택한 최적의 여행지 — 매칭률 88%';
+    if (statMatch) statMatch.textContent = '88%';
+    if (statDuration) statDuration.textContent = '1박 2일';
+    if (statSpots) statSpots.textContent = '6곳';
+    
+    if (mascotCard) {
+      mascotCard.style.display = 'flex';
+      const img = mascotCard.querySelector('img');
+      if (img) img.style.filter = '';
+      const textH3 = mascotCard.querySelector('.mascot-text h3');
+      const textP = mascotCard.querySelector('.mascot-text p');
+      if (textH3) textH3.textContent = '🦁 도슨트 \'신라방\' 등장!';
+      if (textP) textP.textContent = '경주의 수호자 신라방이 여러분의 여행을 함께합니다. 미션을 완료할수록 캐릭터가 점점 선명해져요!';
+    }
+  } else if (festVal === '부산 불꽃 축제') {
+    if (heroImg) {
+      heroImg.src = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2522100%2525%2522%20height%3D%2522100%2525%2522%20xmlns%3D%2522http%3A//www.w3.org/2000/svg%2522%3E%3Cdefs%3E%3ClinearGradient%20id%3D%2522g%2522%20x1%3D%25220%2525%2522%20y1%3D%25220%2525%2522%20x2%3D%2522100%2525%2522%20y2%3D%2522100%2525%2522%3E%3Cstop%20offset%3D%25220%2525%2522%20stop-color%3D%2522%25231A1A2E%2522/%3E%3Cstop%20offset%3D%2522100%2525%2522%20stop-color%3D%2522%252316213E%2522/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%2522100%2525%2522%20height%3D%2522100%2525%2522%20fill%3D%2522url%2528%2523g%2529%2522/%3E%3C/svg%3E';
+      heroImg.style.background = 'linear-gradient(135deg, #1A1A2E 0%, #16213E 100%)';
+    }
+    if (tagContainer) {
+      tagContainer.innerHTML = `
+        <span class="badge orange">📍 부산시, 경남</span>
+        <span class="badge purple">부산 불꽃 축제 10월</span>
+      `;
+    }
+    if (title) title.textContent = '부산으로 떠나요! 🎆';
+    if (desc) desc.textContent = 'AI가 선택한 최적의 여행지 — 매칭률 80%';
+    if (statMatch) statMatch.textContent = '80%';
+    if (statDuration) statDuration.textContent = '1박 2일';
+    if (statSpots) statSpots.textContent = '5곳';
+    
+    if (mascotCard) {
+      mascotCard.style.display = 'flex';
+      const img = mascotCard.querySelector('img');
+      if (img) img.style.filter = 'grayscale(1) opacity(0.5)';
+      const textH3 = mascotCard.querySelector('.mascot-text h3');
+      const textP = mascotCard.querySelector('.mascot-text p');
+      if (textH3) textH3.textContent = '🌊 부산 도슨트 갈매기 대기 중';
+      if (textP) textP.textContent = '부산 지역 도슨트는 현재 연동 준비 중입니다. 경주 지역 코스에서 신라방의 가이드를 전용으로 확인하실 수 있습니다.';
+    }
+  }
+
+  // Update Course Screen header & map label
+  const courseTitle = document.getElementById('course-title');
+  const courseMapLabel = document.getElementById('course-map-label');
+
+  if (festVal === '부산 불꽃 축제') {
+    if (courseTitle) courseTitle.textContent = '부산 1박 2일 코스 (시뮬레이션)';
+    if (courseMapLabel) courseMapLabel.textContent = '📍 부산 관광 동선';
+  } else if (festVal === '경주 벚꽃 축제') {
+    if (courseTitle) courseTitle.textContent = '경주 1박 2일 코스';
+    if (courseMapLabel) courseMapLabel.textContent = '📍 경주 관광 동선';
+  } else {
+    if (courseTitle) courseTitle.textContent = '경주 2박 3일 코스';
+    if (courseMapLabel) courseMapLabel.textContent = '📍 경주 관광 동선';
+  }
+
+  goto('screen-region', 'right');
+}
