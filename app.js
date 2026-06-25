@@ -439,8 +439,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const m = String(now.getMinutes()).padStart(2, '0');
     const timeStr = `${h}:${m}`;
     document.querySelectorAll('.status-bar > span:first-child').forEach(el => {
-      if (!el.closest('[style*="background:transparent"]') &&
-          !el.closest('.status-bar.white')) {
+      if (el.textContent.includes(':') || /^\d{2}:\d{2}$/.test(el.textContent.trim())) {
         el.textContent = timeStr;
       }
     });
