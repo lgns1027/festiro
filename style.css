@@ -1013,6 +1013,61 @@ img { display: block; max-width: 100%; }
   color: var(--primary);
 }
 
+/* ── Spot Recommendation & Seeker My Page Styles ── */
+.recommend-spot-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--primary) !important;
+}
+.seeker-badge-card {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 8px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-main);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.seeker-badge-card:hover {
+  border-color: var(--primary);
+  background: var(--primary-pale);
+  color: var(--primary);
+}
+.seeker-badge-icon {
+  font-size: 24px;
+  margin-bottom: 6px;
+}
+.seeker-job-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  text-align: left;
+}
+.seeker-job-card h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 2px;
+}
+.seeker-job-card p {
+  font-size: 11px;
+  color: var(--text-sub);
+}
+.seeker-job-card .job-badge {
+  margin-left: auto;
+}
+
 /* AI Matching Loading Screen */
 #screen-work-matching-loading {
   background: var(--white);

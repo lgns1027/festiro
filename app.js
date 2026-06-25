@@ -18,6 +18,20 @@ const state = {
     skills: ['SNS 촬영', '영상 편집'],
     minPay: 10
   },
+  completedJobs: [
+    {
+      id: 'mock-job-pre-1',
+      title: '경주 벚꽃축제 영어 통역 가이드',
+      company: '경주시청 관광진흥과 · 경주시',
+      icon: '🏛️',
+      pay: 100000,
+      period: '04.01 ~ 04.03 (3일)',
+      skills: ['외국어 가능', '고객 응대'],
+      region: '경주'
+    }
+  ],
+  seekerBadges: ['외국어 가능', '고객 응대'],
+  userRole: 'tourist',
   jobs: [
     {
       id: 'job-1',
@@ -72,6 +86,9 @@ const screenLabels = {
   'screen-work-matching-loading': '상호 AI 매칭 중...',
   'screen-workation':     '워케이션 공고 목록',
   'screen-work-detail':   '워케이션 공고 상세',
+  'screen-work-complete-notice': '근무 종료 알림',
+  'screen-work-spot-recommendation': '인근 로컬 추천 장소',
+  'screen-work-seeker-mypage': '구직자 마이페이지',
 };
 
 // ── Docent Texts by Language ─────────────────────────────
@@ -84,9 +101,21 @@ const docentTexts = {
 
 // ── Screen Navigation ────────────────────────────────────
 function goto(screenId, direction = 'right') {
+  // Seeker My Page redirect logic
+  if (screenId === 'screen-mypage' && state.userRole === 'seeker') {
+    screenId = 'screen-work-seeker-mypage';
+  } else if (screenId === 'screen-work-seeker-mypage' && state.userRole === 'tourist') {
+    screenId = 'screen-mypage';
+  }
+
   const prev = document.querySelector('.screen.active');
   const next = document.getElementById(screenId);
   if (!next || prev === next) return;
+
+  // Trigger seeker My Page rendering
+  if (screenId === 'screen-work-seeker-mypage') {
+    renderSeekerMypage();
+  }
 
   prev.classList.remove('active');
   next.classList.remove('slide-in-right', 'slide-in-left');
@@ -921,4 +950,120 @@ function showWorkDetail(jobId) {
   
   state.selectedJob = job;
   goto('screen-work-detail', 'right');
+}
+
+// ── Seeker Workation Contract Completion & Recommendations ──
+function simulateContractEnd() {
+  const job = state.selectedJob || state.jobs[0];
+  
+  if (!state.completedJobs.some(j => j.id === job.id)) {
+    state.completedJobs.push(job);
+  }
+  
+  if (job.skills) {
+    job.skills.forEach(s => {
+      if (!state.seekerBadges.includes(s)) {
+        state.seekerBadges.push(s);
+      }
+    });
+  }
+  
+  state.userRole = 'seeker';
+  
+  showToast('💼 워케이션 근무 계약이 성공적으로 종료되었습니다.', 'success');
+  setTimeout(() => {
+    goto('screen-work-complete-notice', 'right');
+  }, 1000);
+}
+
+function goToSpotRecommendation() {
+  goto('screen-work-spot-recommendation', 'right');
+}
+
+function selectRecommendedSpot(spotName) {
+  state.selectedFestival = '신라문화제';
+  state.selectedCategory = '문화재';
+  state.userRole = 'tourist';
+  
+  showToast(`📍 추천 장소 '${spotName}'을(를) 연동하여 코스를 생성합니다!`, 'success');
+  
+  setTimeout(() => {
+    clearDocent();
+    // Update docent texts
+    const text = docentTexts[state.currentLang] || docentTexts.ko;
+    const el1 = document.getElementById('docent-text-ko');
+    const el2 = document.getElementById('docent-text-display');
+    if (el1) el1.textContent = text;
+    if (el2) el2.textContent = text;
+    
+    goto('screen-docent', 'right');
+  }, 1200);
+}
+
+function renderSeekerMypage() {
+  const statJobs = document.getElementById('seeker-stat-jobs');
+  const statPay = document.getElementById('seeker-stat-pay');
+  const statBadges = document.getElementById('seeker-stat-badges');
+  
+  const numJobs = state.completedJobs.length;
+  const totalPay = state.completedJobs.reduce((acc, j) => {
+    const days = j.period && j.period.includes('5일') ? 5 : 3;
+    return acc + (j.pay * days);
+  }, 0);
+  const numBadges = state.seekerBadges.length;
+  
+  if (statJobs) statJobs.textContent = numJobs;
+  if (statPay) statPay.textContent = totalPay > 0 ? (totalPay / 10000) + '만' : '0';
+  if (statBadges) statBadges.textContent = numBadges;
+  
+  const badgeGrid = document.getElementById('seeker-badge-grid');
+  if (badgeGrid) {
+    if (state.seekerBadges.length === 0) {
+      badgeGrid.innerHTML = `
+        <div class="seeker-badge-card" style="grid-column: span 4; background: rgba(0,0,0,0.02); border-style: dashed; padding: 20px;">
+          <p style="color: var(--text-muted); font-size: 11px;">완료된 워케이션이 없습니다.</p>
+        </div>
+      `;
+    } else {
+      badgeGrid.innerHTML = state.seekerBadges.map(badge => {
+        let emoji = '🎖️';
+        if (badge.includes('SNS') || badge.includes('촬영')) emoji = '📸';
+        else if (badge.includes('편집') || badge.includes('영상')) emoji = '🎬';
+        else if (badge.includes('외국어') || badge.includes('영어') || badge.includes('한국어')) emoji = '🗣️';
+        else if (badge.includes('고객') || badge.includes('응대') || badge.includes('안내')) emoji = '🤝';
+        else if (badge.includes('카페') || badge.includes('바리스타')) emoji = '☕';
+        
+        return `
+          <div class="seeker-badge-card" onclick="showToast('${badge} 역량 검증 완료!','success')">
+            <div class="seeker-badge-icon">${emoji}</div>
+            <div>${badge}</div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+  
+  const jobList = document.getElementById('seeker-job-list');
+  const noJobsMsg = document.getElementById('no-jobs-msg');
+  if (jobList) {
+    if (state.completedJobs.length === 0) {
+      if (noJobsMsg) noJobsMsg.style.display = 'block';
+      jobList.innerHTML = '';
+    } else {
+      if (noJobsMsg) noJobsMsg.style.display = 'none';
+      
+      jobList.innerHTML = state.completedJobs.map(job => {
+        return `
+          <div class="seeker-job-card">
+            <div style="font-size: 24px;">🏛️</div>
+            <div>
+              <h4 style="font-size: 13px; font-weight:700; color:var(--text-main); margin-bottom:2px;">${job.title}</h4>
+              <p style="font-size: 11px; color:var(--text-sub);">${job.company} · 완료</p>
+            </div>
+            <div class="job-badge" style="margin-left:auto;"><span class="badge green">이수 완료</span></div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
 }
