@@ -29,7 +29,7 @@
         <div class="screen active" id="screen-splash">
           <div class="splash-logo">
             <img src="assets/logo.png" class="splash-logo-img" alt="페스티로 로고" />
-            <h1>Festi_ro</h1>
+            <h1>페스티로</h1>
             <p>나만을 위한 로컬 축제 &amp; 워케이션</p>
           </div>
           <div class="splash-bottom">
@@ -598,6 +598,8 @@
              SCREEN 7 : Real-time Navigation
         ───────────────────────────────────────── -->
         <div class="screen" id="screen-nav">
+          <div class="status-bar"><span>16:17</span><div class="status-bar-right">🔋</div></div>
+          
           <div class="nav-map-area">
             <div class="nav-map-grid"></div>
             <div class="nav-route-line"></div>
@@ -620,7 +622,9 @@
             </div>
 
             <div class="user-location-dot" id="user-dot"></div>
+          </div>
 
+          <div class="nav-bottom">
             <div class="nav-overlay-card">
               <h3 id="nav-route-title">🧭 경주 역사유적 → 첨성대</h3>
               <p id="nav-route-desc">도보 약 15분 · 북동쪽 방향으로 이동</p>
@@ -630,9 +634,6 @@
                 <div class="nav-info-item"><div class="val" id="nav-progress-num">3/4</div><div class="lbl">완료 거점</div></div>
               </div>
             </div>
-          </div>
-
-          <div class="nav-bottom">
             <div class="nav-progress-track" id="nav-progress-track">
               <div class="nav-progress-dot done"></div>
               <div class="nav-progress-dot done"></div>
