@@ -676,10 +676,10 @@
 
           <!-- 언어 선택 -->
           <div class="lang-tabs">
-            <div class="lang-tab active" onclick="switchLang(this,'ko')">🇰🇷 한국어</div>
-            <div class="lang-tab" onclick="switchLang(this,'en')">🇺🇸 English</div>
-            <div class="lang-tab" onclick="switchLang(this,'ja')">🇯🇵 日本語</div>
-            <div class="lang-tab" onclick="switchLang(this,'zh')">🇨🇳 中文</div>
+            <div class="lang-tab active" onclick="switchLang(this,'ko')">🇰🇷<br/>한국어</div>
+            <div class="lang-tab" onclick="switchLang(this,'en')">🇺🇸<br/>English</div>
+            <div class="lang-tab" onclick="switchLang(this,'ja')">🇯🇵<br/>日本語</div>
+            <div class="lang-tab" onclick="switchLang(this,'zh')">🇨🇳<br/>中文</div>
           </div>
 
           <!-- 음성/텍스트 모드 -->
@@ -691,6 +691,9 @@
           <div class="guide-content">
             <!-- 음성 가이드 -->
             <div id="voice-guide-content">
+              <div class="guide-text-card">
+                <p id="docent-text-ko">"반갑습니다! 저는 천년 신라의 수호자 신라방입니다. 지금 여러분이 서 계신 첨성대는 선덕여왕 632년에 축조된 동양에서 가장 오래된 천문 관측대입니다. 높이 9.17m, 362개의 돌로 쌓인 이 탑은 신라인들이 하늘과 소통하던 신성한 공간이었답니다."</p>
+              </div>
               <div class="voice-player">
                 <div class="voice-waveform" id="waveform">
                   <div class="wave-bar" style="height:12px"></div>
@@ -708,9 +711,6 @@
                 </div>
                 <button class="voice-play-btn" id="voice-play-btn" onclick="toggleVoice()">▶</button>
                 <div style="color:rgba(255,255,255,0.85);font-size:12px;text-align:center;" id="voice-status">재생 버튼을 눌러 음성 안내를 시작하세요</div>
-              </div>
-              <div class="guide-text-card">
-                <p id="docent-text-ko">"반갑습니다! 저는 천년 신라의 수호자 신라방입니다. 지금 여러분이 서 계신 첨성대는 선덕여왕 632년에 축조된 동양에서 가장 오래된 천문 관측대입니다. 높이 9.17m, 362개의 돌로 쌓인 이 탑은 신라인들이 하늘과 소통하던 신성한 공간이었답니다."</p>
               </div>
             </div>
 

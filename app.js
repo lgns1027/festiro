@@ -163,7 +163,7 @@ function switchLang(tab, lang) {
   if (el1) el1.textContent = text;
   if (el2) el2.textContent = text;
 
-  showToast(`언어가 ${tab.textContent.trim()} 으로 변경되었습니다`, '');
+  showToast(`언어가 ${tab.textContent.replace(/\s+/g, ' ').trim()} 으로 변경되었습니다`, '');
 }
 
 // ── Guide Mode Switch ────────────────────────────────────
