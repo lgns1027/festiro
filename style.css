@@ -347,14 +347,14 @@ img { display: block; max-width: 100%; }
   gap: 0;
 }
 .splash-logo { text-align: center; padding: 0 40px; }
-.splash-logo .logo-icon {
-  width: 80px; height: 80px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 24px;
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 20px;
-  font-size: 40px;
-  backdrop-filter: blur(10px);
+.splash-logo-img {
+  width: 140px; height: 140px;
+  border-radius: 36px;
+  object-fit: cover;
+  margin: 0 auto 24px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  background: #fff;
+  padding: 8px;
 }
 .splash-logo h1 {
   font-size: 32px; font-weight: 800; color: #fff;
@@ -1423,3 +1423,29 @@ img { display: block; max-width: 100%; }
 .ticket-barcode .bar:nth-child(2n) { width: 4px; }
 .ticket-barcode .bar:nth-child(3n) { width: 1px; }
 .ticket-barcode .bar:nth-child(5n) { width: 3px; }
+
+/* ── Responsive Mobile Media Query ──────────────────────── */
+@media (max-width: 500px) {
+  .simulator-shell {
+    padding: 0;
+    gap: 0;
+    min-height: 100vh;
+  }
+  .phone-wrap {
+    width: 100vw;
+    height: 100vh;
+  }
+  .phone-device {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .phone-device::before {
+    display: none; /* Hide Dynamic Island on actual mobile screens */
+  }
+  .phone-screen {
+    border-radius: 0;
+  }
+}
+

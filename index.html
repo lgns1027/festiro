@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>로컬 축제 추천 & 워케이션 매칭 — 프로토타입</title>
+<title>페스티로 (FESTIRO) — 로컬 축제 & 워케이션</title>
 <meta name="description" content="유저 정보 기반 맞춤형 로컬 축제 추천 및 워케이션 매칭 서비스 인터랙티브 프로토타입" />
 <link rel="stylesheet" href="style.css" />
 </head>
@@ -28,8 +28,8 @@
         ───────────────────────────────────────── -->
         <div class="screen active" id="screen-splash">
           <div class="splash-logo">
-            <div class="logo-icon">🎉</div>
-            <h1>Festival Go</h1>
+            <img src="assets/logo.png" class="splash-logo-img" alt="페스티로 로고" />
+            <h1>페스티로</h1>
             <p>나만을 위한 로컬 축제 &amp; 워케이션</p>
           </div>
           <div class="splash-bottom">
@@ -1113,7 +1113,7 @@
           <div class="modal-overlay" onclick="closeRegionConfirmModal()"></div>
           <div class="ticket-card">
             <div class="ticket-top">
-              <div class="ticket-brand">🎉 Festival Go Boarding Pass</div>
+              <div class="ticket-brand">🎉 FESTIRO Boarding Pass</div>
               <div class="ticket-logo">🤖 Match 96%</div>
             </div>
             <div class="ticket-middle">
@@ -1160,64 +1160,7 @@
     </div><!-- /phone-device -->
   </div><!-- /phone-wrap -->
 
-  <!-- ════════════════════════════════════
-       SIMULATOR CONTROL PANEL
-  ════════════════════════════════════ -->
-  <div class="simulator-panel">
-    <div class="sim-title">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      시뮬레이터 패널
-    </div>
-
-    <!-- 현재 화면 -->
-    <div class="sim-card">
-      <h4>📱 현재 화면</h4>
-      <p id="current-screen-label" style="font-size:13px;font-weight:700;color:var(--primary);">스플래시 화면</p>
-      <div class="sim-label">여정 바로가기</div>
-      <button class="sim-btn outline" onclick="goto('screen-onboarding','right')">🏯 관광객 여정 시작</button>
-      <button class="sim-btn outline" onclick="goto('screen-workation','right')">💼 워케이션 여정 시작</button>
-      <button class="sim-btn outline" onclick="goto('screen-mypage','right')">👤 마이페이지</button>
-    </div>
-
-    <!-- GPS 시뮬레이터 -->
-    <div class="sim-card">
-      <h4>📍 GPS 시뮬레이터</h4>
-      <p>GPS 위치 이벤트를 시뮬레이션하여 내비게이션 반응을 테스트합니다.</p>
-      <div class="sim-flow-indicator" id="sim-gps-dots">
-        <div class="sim-dot done" title="경주 역사유적"></div>
-        <div class="sim-dot done" title="교리김밥"></div>
-        <div class="sim-dot active" title="첨성대"></div>
-        <div class="sim-dot" title="동궁과 월지"></div>
-      </div>
-      <button class="sim-btn" onclick="simulateArrival()">📍 거점 도착 시뮬레이션</button>
-      <button class="sim-btn outline" onclick="goto('screen-nav','right')">🗺️ 내비게이션 화면으로</button>
-    </div>
-
-    <!-- 미션 시뮬레이터 -->
-    <div class="sim-card">
-      <h4>🎯 미션 시뮬레이터</h4>
-      <p>사진 업로드 및 미션 완료 이벤트를 발생시킵니다.</p>
-      <button class="sim-btn green" onclick="completeMission(3)">📷 첨성대 미션 완료</button>
-      <button class="sim-btn green" onclick="completeMission(4)">🌙 야경 미션 완료 + 코스 완주</button>
-      <button class="sim-btn outline" onclick="goto('screen-mission','right')">📋 미션 화면으로</button>
-    </div>
-
-    <!-- AI 매칭 시뮬레이터 -->
-    <div class="sim-card">
-      <h4>🤖 AI 제안 알림</h4>
-      <p>구인 담당자가 AI를 통해 지원자에게 먼저 제안을 보내는 시나리오입니다.</p>
-      <button class="sim-btn" onclick="triggerAIProposal()">📨 AI 제안 수신 시뮬레이션</button>
-      <button class="sim-btn outline" onclick="goto('screen-work-detail','right')">📄 공고 상세 보기</button>
-    </div>
-
-    <!-- 도슨트 -->
-    <div class="sim-card">
-      <h4>🦁 도슨트 캐릭터</h4>
-      <p>미션 완료에 따라 캐릭터가 선명해지는 효과를 테스트합니다.</p>
-      <button class="sim-btn" onclick="goto('screen-docent','right');setTimeout(clearDocent,400)">🔲 흐린 상태 (시작)</button>
-      <button class="sim-btn outline" onclick="goto('screen-docent','right');setTimeout(sharpDocent,400)">✨ 선명한 상태 (미션 후)</button>
-    </div>
-  </div>
+  </div><!-- /phone-wrap -->
 
 </div><!-- /simulator-shell -->
 
