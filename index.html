@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>로컬 축제 추천 & 워케이션 매칭 — 프로토타입</title>
+<meta name="description" content="유저 정보 기반 맞춤형 로컬 축제 추천 및 워케이션 매칭 서비스 인터랙티브 프로토타입" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="simulator-shell">
+
+  <!-- ════════════════════════════════════
+       PHONE MOCKUP
+  ════════════════════════════════════ -->
+  <div class="phone-wrap">
+    <div class="phone-device">
+      <div class="phone-screen">
+
+        <!-- ── Toast ───────────────────── -->
+        <div class="toast" id="toast"></div>
+        <!-- ── Confetti ────────────────── -->
+        <div class="confetti-overlay" id="confetti"></div>
+
+        <!-- ─────────────────────────────────────────
+             SCREEN 0 : Splash
+        ───────────────────────────────────────── -->
+        <div class="screen active" id="screen-splash">
+          <div class="splash-logo">
+            <div class="logo-icon">🎉</div>
+            <h1>Festival Go</h1>
+            <p>나만을 위한 로컬 축제 &amp; 워케이션</p>
+          </div>
+          <div class="splash-bottom">
+            <div class="splash-btn-white" onclick="goto('screen-category','right')">외래 관광객으로 시작하기</div>
+            <div class="splash-btn-outline" onclick="goto('screen-workation','right')">워케이션 구직자로 시작하기</div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────
+             SCREEN 1 : Category Select
+        ───────────────────────────────────────── -->
+        <div class="screen" id="screen-category">
+          <div class="status-bar">
+            <span>16:17</span>
+            <div class="status-bar-right">
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1"/></svg>
+              🔋
+            </div>
+          </div>
+
+          <div class="category-hero">
+            <p class="greeting">✈️ 한국에 오신 걸 환영합니다!</p>
+            <h2>어떤 여행 스타일을<br/>우선으로 즐기시나요?</h2>
+            <p>선택에 따라 맞춤 축제를 추천해 드려요</p>
+          </div>
+
+          <!-- Step Indicator -->
+          <div class="step-indicator" style="padding:0 20px 16px;">
+            <div class="step-dot active">1</div>
+            <div class="step-line"></div>
+            <div class="step-dot">2</div>
+            <div class="step-line"></div>
+            <div class="step-dot">3</div>
+          </div>
+
+          <div class="category-grid" id="category-grid">
+            <div class="category-card food" data-cat="food" onclick="selectCategory(this)">
+              <div class="check-mark">✓</div>
+              <span class="emoji">🍜</span>
+              <h3>식도락</h3>
+              <p>현지 음식, 로컬 맛집, 전통 식문화 체험</p>
+            </div>
+            <div class="category-card fun" data-cat="fun" onclick="selectCategory(this)">
+              <div class="check-mark">✓</div>
+              <span class="emoji">🎭</span>
+              <h3>오락</h3>
+              <p>K-팝, 테마파크, 이색 체험 공간</p>
+            </div>
+            <div class="category-card beauty" data-cat="beauty" onclick="selectCategory(this)">
+              <div class="check-mark">✓</div>
+              <span class="emoji">💄</span>
+              <h3>뷰티 &amp; 미용</h3>
+              <p>K-뷰티, 쇼핑, 트렌드 패션</p>
+            </div>
+            <div class="category-card culture" data-cat="culture" onclick="selectCategory(this)">
+              <div class="check-mark">✓</div>
+              <span class="emoji">🏯</span>
+              <h3>문화재</h3>
+              <p>역사 유산, 전통 문화, 고궁 탐방</p>
+            </div>
+          </div>
+
+          <div class="category-footer">
+            <button class="btn-primary" id="cat-next-btn" onclick="goto('screen-conditions','right')" disabled
+              style="opacity:0.4;cursor:not-allowed;" aria-label="다음 단계로">
+              다음 단계로 →
+            </button>
+          </div>
+
+          <!-- Bottom Nav -->
+          <div class="bottom-nav">
+            <div class="nav-item active" onclick="goto('screen-category','right')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>홈
+            </div>
+            <div class="nav-item" onclick="goto('screen-festival-list','right')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>탐색
+            </div>
+            <div class="nav-item" onclick="goto('screen-workation','right')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>워케이션
+            </div>
+            <div class="nav-item" onclick="goto('screen-mypage','right')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>마이
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────
+             SCREEN 2 : Travel Conditions
+        ───────────────────────────────────────── -->
+        <div class="screen" id="screen-conditions">
+          <div class="status-bar"><span>16:17</span><div class="status-bar-right">🔋</div></div>
+          <div class="screen-header">
+            <button class="back-btn" onclick="goto('screen-category','left')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <h2>여행 조건 설정</h2>
+          </div>
+
+          <!-- Step Indicator -->
+          <div class="step-indicator">
+            <div class="step-dot done">✓</div>
+            <div class="step-line done"></div>
+            <div class="step-dot active">2</div>
+            <div class="step-line"></div>
+            <div class="step-dot">3</div>
+          </div>
+
+          <div class="conditions-body">
+            <!-- 체류 기간 -->
+            <div class="condition-section">
+              <h3><span>🗓️</span> 체류 기간</h3>
+              <div class="stay-grid">
+                <div class="stay-btn" onclick="toggleOption(this,'stay')" data-val="당일">당일치기<span class="sub">0박</span></div>
+                <div class="stay-btn" onclick="toggleOption(this,'stay')" data-val="1박2일">1박 2일</div>
+                <div class="stay-btn selected" onclick="toggleOption(this,'stay')" data-val="2박3일">2박 3일</div>
+                <div class="stay-btn" onclick="toggleOption(this,'stay')" data-val="3박4일">3박 4일</div>
+                <div class="stay-btn" onclick="toggleOption(this,'stay')" data-val="4박5일">4박 5일</div>
+                <div class="stay-btn" onclick="toggleOption(this,'stay')" data-val="5박6일">5박 6일</div>
+              </div>
+            </div>
+
+            <!-- 동반자 유형 -->
+            <div class="condition-section">
+              <h3><span>👥</span> 여행 동반자</h3>
+              <div class="option-row">
+                <div class="option-btn" onclick="toggleOption(this,'companion')" data-val="solo">혼자</div>
+                <div class="option-btn selected" onclick="toggleOption(this,'companion')" data-val="friend">친구</div>
+                <div class="option-btn" onclick="toggleOption(this,'companion')" data-val="couple">연인</div>
+                <div class="option-btn" onclick="toggleOption(this,'companion')" data-val="family">가족</div>
+                <div class="option-btn" onclick="toggleOption(this,'companion')" data-val="senior">부모님</div>
+              </div>
+            </div>
+
+            <!-- 이동 수단 -->
+            <div class="condition-section">
+              <h3><span>🚌</span> 이동 수단</h3>
+              <div class="option-row">
+                <div class="option-btn selected" onclick="toggleOption(this,'transport')" data-val="public">대중교통</div>
+                <div class="option-btn" onclick="toggleOption(this,'transport')" data-val="car">렌터카</div>
+                <div class="option-btn" onclick="toggleOption(this,'transport')" data-val="walk">도보 위주</div>
+                <div class="option-btn" onclick="toggleOption(this,'transport')" data-val="tour">투어 버스</div>
+              </div>
+            </div>
+
+            <!-- 관심 스타일 -->
+            <div class="condition-section">
+              <h3><span>✨</span> 여행 스타일 (복수 선택)</h3>
+              <div class="option-row">
+                <div class="option-btn selected chip" onclick="this.classList.toggle('selected')">맛집 탐방</div>
+                <div class="option-btn chip" onclick="this.classList.toggle('selected')">SNS 핫플</div>
+                <div class="option-btn chip" onclick="this.classList.toggle('selected')">역사 유적</div>
+                <div class="option-btn selected chip" onclick="this.classList.toggle('selected')">야경 투어</div>
+                <div class="option-btn chip" onclick="this.classList.toggle('selected')">자연 힐링</div>
+                <div class="option-btn chip" onclick="this.classList.toggle('selected')">전통 체험</div>
+                <div class="option-btn chip" onclick="this.classList.toggle('selected')">쇼핑</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="conditions-footer">
+            <button class="btn-primary" onclick="startAIAnalysis()">🤖 AI 맞춤 축제 추천받기</button>
+          </div>
+
+          <div class="bottom-nav">
+            <div class="nav-item" onclick="goto('screen-category','left')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>홈
+            </div>
+            <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>탐색</div>
+            <div class="nav-item" onclick="goto('screen-workation','right')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>워케이션</div>
+            <div class="nav-item" onclick="goto('screen-mypage','right')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>마이</div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────
+             SCREEN 3 : AI Spinner (분석 중)
+        ───────────────────────────────────────── -->
+        <div class="screen" id="screen-analyzing">
+          <div class="status-bar"><span>16:17</span><div class="status-bar-right">🔋</div></div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+            <div class="ai-spinner">
+              <div class="spinner-ring"></div>
+              <div class="spinner-text" id="spinner-text">유저 취향을 분석하고 있어요 ✨<br/>잠깐만 기다려 주세요</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────
+             SCREEN 4 : Festival Recommendation List
+        ───────────────────────────────────────── -->
+        <div class="screen" id="screen-festival-list">
+          <div class="status-bar"><span>16:17</span><div class="status-bar-right">🔋</div></div>
+          <div class="screen-header">
+            <button class="back-btn" onclick="goto('screen-conditions','left')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <h2>추천 축제 리스트</h2>
+          </div>
+
+          <div class="ai-result-banner">
+            <div class="ai-icon">🤖</div>
+            <div>
+              <h3>AI 분석 완료!</h3>
+              <p>문화재 + 야경 + 2박 3일 조건에 딱 맞는 축제를 찾았어요</p>
+            </div>
+          </div>
+
+          <!-- Step Indicator -->
+          <div class="step-indicator" style="padding:0 20px 16px;">
+            <div class="step-dot done">✓</div>
+            <div class="step-line done"></div>
+            <div class="step-dot done">✓</div>
+            <div class="step-line done"></div>
+            <div class="step-dot active">3</div>
+          </div>
+
+          <div class="festival-scroll-area">
+            <!-- 1st: 신라문화제 -->
+            <div class="festival-item" id="fest-1" onclick="selectFestival(this,'신라문화제')">
+              <img class="festival-item-img" src="assets/festival.png" alt="신라문화제" />
+              <div class="festival-item-body">
+                <div class="festival-item-top">
+                  <h3>🏯 신라문화제</h3>
+                  <div class="match-score">
+                    <span>96%</span>
+                    <div class="score-bar"><div class="score-fill" style="width:96%"></div></div>
+                  </div>
+                </div>
+                <div class="festival-meta">
+                  <span class="badge orange">📍 경주시</span>
+                  <span class="badge green">10월 2~6일</span>
+                  <span class="badge blue">문화재</span>
+                </div>
+                <p class="festival-desc">천년 신라의 역사와 문화를 경험할 수 있는 대표 축제. 첨성대, 동궁과 월지 야경 특별 투어 포함.</p>
+              </div>
+            </div>
+
+            <!-- 2nd: 경주 벚꽃축제 -->
+            <div class="festival-item" id="fest-2" onclick="selectFestival(this,'경주 벚꽃 축제')">
+              <div class="festival-item-img" style="background:linear-gradient(135deg,#FFB6C1,#FFC0CB);display:flex;align-items:center;justify-content:center;font-size:60px;">🌸</div>
+              <div class="festival-item-body">
+                <div class="festival-item-top">
+                  <h3>🌸 경주 벚꽃 축제</h3>
+                  <div class="match-score">
+                    <span>88%</span>
+                    <div class="score-bar"><div class="score-fill" style="width:88%"></div></div>
+                  </div>
+                </div>
+                <div class="festival-meta">
+                  <span class="badge orange">📍 경주시</span>
+                  <span class="badge green">3월 말~4월 초</span>
+                  <span class="badge blue">자연</span>
+                </div>
+                <p class="festival-desc">보문호 주변 2km 벚꽃길과 황리단길이 연결되는 경주 최대 봄 축제.</p>
+              </div>
+            </div>
+
+            <!-- 3rd: 부산 불꽃 축제 -->
+            <div class="festival-item" id="fest-3" onclick="selectFestival(this,'부산 불꽃 축제')">
+              <div class="festival-item-img" style="background:linear-gradient(135deg,#1A1A2E,#4A3F7A);display:flex;align-items:center;justify-content:center;font-size:60px;">🎆</div>
+              <div class="festival-item-body">
+                <div class="festival-item-top">
+                  <h3>🎆 부산 불꽃 축제</h3>
+                  <div class="match-score">
+                    <span>80%</span>
+                    <div class="score-bar"><div class="score-fill" style="width:80%"></div></div>
+                  </div>
+                </div>
+                <div class="festival-meta">
+                  <span class="badge orange">📍 부산시</span>
+                  <span class="badge green">10월 말</span>
+                  <span class="badge blue">오락</span>
+                </div>
+                <p class="festival-desc">광안리 해수욕장 일대에서 펼쳐지는 국내 최대 규모 불꽃놀이 축제.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="festival-list-footer">
+            <button class="btn-primary" id="fest-next-btn" onclick="goto('screen-region','right')" disabled
+              style="opacity:0.4;cursor:not-allowed;">
+              선택한 축제로 코스 만들기 →
+            </button>
+          </div>
+
+          <div class="bottom-nav">
+            <div class="nav-item" onclick="goto('screen-category','left')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>홈</div>
+            <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>탐색</div>
+            <div class="nav-item" onclick="goto('screen-workation','right')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>워케이션</div>
+            <div class="nav-item" onclick="goto('screen-mypage','right')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>마이</div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────
+             SCREEN 5 : Region + Mascot Intro
+        ───────────────────────────────────────── -->
+        <div class="screen" id="screen-region">
+          <div class="status-bar" style="position:absolute;top:0;left:0;right:0;z-index:10;background:transparent;" class="white">
+            <button class="back-btn" style="background:rgba(0,0,0,0.3);" onclick="goto('screen-festival-list','left')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+          </div>
+
+          <div class="region-hero">
+            <img src="assets/cheomseongdae.png" alt="경주 첨성대" />
+            <div class="region-hero-overlay">
+              <div class="region-tag">
+                <span class="badge orange">📍 경주시, 경북</span>
+                <span class="badge blue">신라문화제 10월</span>
+              </div>
+              <h2>경주로 떠나요! 🏯</h2>
+              <p>AI가 선택한 최적의 여행지 — 매칭률 96%</p>
+            </div>
+          </div>
+
+          <div class="region-body">
+            <div class="region-stat-row">
+              <div class="region-stat"><div class="val">96%</div><div class="lbl">AI 매칭률</div></div>
+              <div class="region-stat"><div class="val">2박 3일</div><div class="lbl">추천 일정</div></div>
+              <div class="region-stat"><div class="val">12곳</div><div class="lbl">추천 스폿</div></div>
+            </div>
+
+            <div class="mascot-intro-card">
+              <img src="assets/mascot.png" alt="신라방 캐릭터" />
+              <div class="mascot-text">
+                <h3>🦁 도슨트 '신라방' 등장!</h3>
+                <p>경주의 수호자 신라방이 여러분의 여행을 함께합니다. 미션을 완료할수록 캐릭터가 점점 선명해져요!</p>
+              </div>
+            </div>
+
+            <button class="btn-primary" onclick="goto('screen-course','right')">
+              🗺️ 최적 동선 &amp; 코스 보기
+            </button>
+          </div>
+
+          <div class="bottom-nav">
+            <div class="nav-item" onclick="goto('screen-category','left')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>홈</div>
+            <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>탐색</div>
+            <div class="nav-item" onclick="goto('screen-workation','right')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>워케이션</div>
+            <div class="nav-item" onclick="goto('screen-mypage','right')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>마이</div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────
+             SCREEN 6 : Course + Timeline
+        ───────────────────────────────────────── -->
+        <div class="screen" id="screen-course">
+          <div class="status-bar"><span>16:17</span><div class="status-bar-right">🔋</div></div>
+          <div class="screen-header">
+            <button class="back-btn" onclick="goto('screen-region','left')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <h2>경주 2박 3일 코스</h2>
+          </div>
+
+          <!-- 지도 -->
+          <div class="map-placeholder">
+            <div class="map-road"></div>
+            <span class="map-pin" style="top:18%;left:18%">🏯</span>
+            <span class="map-pin" style="top:45%;left:52%">🌟</span>
+            <span class="map-pin" style="bottom:18%;left:32%">🍜</span>
+            <span class="map-pin" style="top:30%;right:16%">🌿</span>
+            <div class="map-label">📍 경주 관광 동선</div>
+            <div class="map-sublabel">외래 관광객 인기 스폿 포함</div>
+          </div>
+
+          <!-- Day Tabs -->
+          <div class="day-tabs">
+            <div class="day-tab active" onclick="switchDay(this,1)">1일차</div>
+            <div class="day-tab"        onclick="switchDay(this,2)">2일차</div>
+            <div class="day-tab"        onclick="switchDay(this,3)">3일차</div>
+          </div>
+
+          <!-- Day 1 Timeline -->
+          <div class="timeline-wrap" id="day-1">
+            <div class="timeline-item">
+              <div class="timeline-left">
+                <div class="timeline-dot star">★</div>
+                <div class="timeline-connector"></div>
+              </div>
+              <div class="timeline-content">
+                <div class="timeline-card">
+                  <div class="time-label">09:00 AM</div>
+                  <h3>🏯 경주 역사유적지구</h3>
+                  <p>천마총, 대릉원 관람. 신라 왕족의 고분군을 둘러보며 천년 역사 탐방.</p>
+                  <div class="card-footer">
+                    <span class="badge orange">외래객 인기 ⭐</span>
+                    <span class="duration">⏱ 2시간</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-left">
+                <div class="timeline-dot">2</div>
+                <div class="timeline-connector"></div>
+              </div>
+              <div class="timeline-content">
+                <div class="timeline-card">
+                  <div class="time-label">11:30 AM</div>
+                  <h3>🍜 교리김밥 (외래객 맛집)</h3>
+                  <p>경주 대표 로컬 맛집. 현지인과 외래객 모두 사랑하는 교리김밥 본점.</p>
+                  <div class="card-footer">
+                    <span class="badge green">맛집 DB 연동</span>
+                    <span class="duration">⏱ 1시간</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-left">
+                <div class="timeline-dot">3</div>
+                <div class="timeline-connector"></div>
+              </div>
+              <div class="timeline-content">
+                <div class="timeline-card">
+                  <div class="time-label">01:00 PM</div>
+                  <h3>🦋 첨성대</h3>
+                  <p>동양 최고(最古) 천문대. 신라방 미션 거점 #1.</p>
+                  <div class="card-footer">
+                    <span class="badge blue">미션 거점</span>
+                    <span class="duration">⏱ 1시간</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-left">
+                <div class="timeline-dot star">🌙</div>
+                <div class="timeline-connector" style="display:none"></div>
+              </div>
+              <div class="timeline-content">
+                <div class="timeline-card">
+                  <div class="time-label">07:00 PM</div>
+                  <h3>🌟 동궁과 월지 야경</h3>
+                  <p>신라문화제 야간 특별 투어. 조명 연출과 전통 공연이 어우러지는 하이라이트.</p>
+                  <div class="card-footer">
+                    <span class="badge orange">축제 메인 이벤트</span>
+                    <span class="duration">⏱ 2시간</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Day 2 Timeline -->
+          <div class="timeline-wrap" id="day-2" style="display:none">
+            <div class="timeline-item">
+              <div class="timeline-left"><div class="timeline-dot star">★</div><div class="timeline-connector"></div></div>
+              <div class="timeline-content">
+                <div class="timeline-card">
+                  <div class="time-label">09:00 AM</div>
+                  <h3>🏔️ 불국사</h3>
+                  <p>유네스코 세계문화유산. 신라 최전성기 불교 건축의 걸작.</p>
+                  <div class="card-footer"><span class="badge blue">미션 거점</span><span class="duration">⏱ 2.5시간</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-left"><div class="timeline-dot">2</div><div class="timeline-connector"></div></div>
+              <div class="timeline-content">
+                <div class="timeline-card">
+                  <div class="time-label">12:00 PM</div>
+                  <h3>🌿 석굴암</h3>
+                  <p>토함산 정상의 신라 걸작. 불국사에서 셔틀버스 운행.</p>
+                  <div class="card-footer"><span class="badge orange">외래객 인기 ⭐</span><span class="duration">⏱ 1.5시간</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-left"><div class="timeline-dot star">🎭</div><div class="timeline-connector" style="display:none"></div></div>
+              <div class="timeline-content">
+                <div class="timeline-card">
+                  <div class="time-label">06:00 PM</div>
+                  <h3>🎭 신라문화제 메인 공연</h3>
+                  <p>경주 중심 광장 야외 무대. 전통 의상 퍼레이드 및 불꽃 쇼.</p>
+                  <div class="card-footer"><span class="badge orange">축제 메인 이벤트</span><span class="duration">⏱ 3시간</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Day 3 Timeline -->
+          <div class="timeline-wrap" id="day-3" style="display:none">
+            <div class="timeline-item">
+              <div class="timeline-left"><div class="timeline-dot star">★</div><div class="timeline-connector"></div></div>
+              <div class="timeline-content">
+                <div class="timeline-card">
+                  <div class="time-label">10:00 AM</div>
+                  <h3>🛍️ 황리단길</h3>
+                  <p>경주의 핫플레이스. 전통 한옥과 현대 카페·숍이 공존하는 거리.</p>
+                  <div class="card-footer"><span class="badge green">맛집 DB 연동</span><span class="duration">⏱ 2시간</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-left"><div class="timeline-dot star">🏠</div><div class="timeline-connector" style="display:none"></div></div>
+              <div class="timeline-content">
+                <div class="timeline-card">
+                  <div class="time-label">02:00 PM</div>
+                  <h3>🚉 귀가 / 이동</h3>
+                  <p>경주역 → KTX 신경주역. 알찬 2박 3일 경주 여행 완료!</p>
+                  <div class="card-footer"><span class="badge gray">코스 완주 처리</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding:0 20px 20px; display:flex; gap:10px;">
+            <button class="btn-secondary" style="flex:1" onclick="goto('screen-docent','right')">🎙️ AI 도슨트</button>
+            <button class="btn-primary" style="flex:1" onclick="goto('screen-nav','right')">🚀 코스 시작</button>
+          </div>
+
+          <div class="bottom-nav">
+            <div class="nav-item" onclick="goto('screen-category','left')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>홈</div>
+            <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>탐색</div>
+            <div class="nav-item" onclick="goto('screen-workation','right')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>워케이션</div>
+            <div class="nav-item" onclick="goto('screen-mypage','right')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>마이</div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────
+             SCREEN 7 : Real-time Navigation
+        ───────────────────────────────────────── -->
+        <div class="screen" id="screen-nav">
+          <div class="nav-map-area">
+            <div class="nav-map-grid"></div>
+            <div class="nav-route-line"></div>
+
+            <div class="nav-pin" id="pin-1">
+              <div class="pin-dot done">✓</div>
+              <div class="pin-label">경주 역사유적</div>
+            </div>
+            <div class="nav-pin" id="pin-2">
+              <div class="pin-dot done">✓</div>
+              <div class="pin-label">교리김밥</div>
+            </div>
+            <div class="nav-pin" id="pin-3">
+              <div class="pin-dot" id="pin3-dot">🏯</div>
+              <div class="pin-label">첨성대</div>
+            </div>
+            <div class="nav-pin" id="pin-4">
+              <div class="pin-dot" style="background:rgba(255,255,255,0.2);color:#fff;font-size:12px">🌙</div>
+              <div class="pin-label">동궁과 월지</div>
+            </div>
+
+            <div class="user-location-dot" id="user-dot"></div>
+
+            <div class="nav-overlay-card">
+              <h3>🧭 경주 역사유적 → 첨성대</h3>
+              <p>도보 약 15분 · 북동쪽 방향으로 이동</p>
+              <div class="nav-info-row">
+                <div class="nav-info-item"><div class="val" id="nav-dist">620m</div><div class="lbl">남은 거리</div></div>
+                <div class="nav-info-item"><div class="val" id="nav-time">8분</div><div class="lbl">예상 시간</div></div>
+                <div class="nav-info-item"><div class="val">3/4</div><div class="lbl">완료 거점</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-bottom">
+            <div class="nav-progress-track">
+              <div class="nav-progress-dot done"></div>
+              <div class="nav-progress-dot done"></div>
+              <div class="nav-progress-dot active"></div>
+              <div class="nav-progress-dot"></div>
+            </div>
+            <div class="nav-spot-card">
+              <div class="nav-spot-icon">🏯</div>
+              <div class="spot-info">
+                <h4>다음 거점 : 첨성대</h4>
+                <p>신라방 미션 수행 가능 · GPS 인증 필요</p>
+              </div>
+              <div class="spot-status">
+                <button class="mission-upload-btn" onclick="goto('screen-mission','right')">미션 →</button>
+              </div>
+            </div>
+            <div style="margin-top:16px;display:flex;gap:10px;">
+              <button class="btn-secondary" style="flex:1" onclick="goto('screen-course','left')">← 코스 보기</button>
+              <button class="btn-primary" style="flex:1;background:#10B981;box-shadow:0 4px 20px rgba(16,185,129,0.35);" onclick="simulateArrival()">📍 도착 인증</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────
+             SCREEN 8 : Docent Guide
+        ───────────────────────────────────────── -->
+        <div class="screen" id="screen-docent">
+          <div class="status-bar"><span>16:17</span><div class="status-bar-right">🔋</div></div>
+          <div class="screen-header">
+            <button class="back-btn" onclick="goto('screen-course','left')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <h2>AI 도슨트 가이드</h2>
+          </div>
+
+          <div class="docent-hero">
+            <img src="assets/mascot.png" alt="신라방" class="docent-mascot" id="docent-mascot" />
+            <div class="docent-name">🦁 신라방 (新羅方)</div>
+            <div class="docent-desc">경주의 수호 AI 도슨트 · 미션 3/4 완료</div>
+          </div>
+
+          <!-- 언어 선택 -->
+          <div class="lang-tabs">
+            <div class="lang-tab active" onclick="switchLang(this,'ko')">🇰🇷 한국어</div>
+            <div class="lang-tab" onclick="switchLang(this,'en')">🇺🇸 English</div>
+            <div class="lang-tab" onclick="switchLang(this,'ja')">🇯🇵 日本語</div>
+            <div class="lang-tab" onclick="switchLang(this,'zh')">🇨🇳 中文</div>
+          </div>
+
+          <!-- 음성/텍스트 모드 -->
+          <div class="guide-mode-toggle">
+            <div class="guide-mode-btn active" id="mode-voice" onclick="switchGuideMode('voice')">🎙️ 음성 가이드</div>
+            <div class="guide-mode-btn" id="mode-text" onclick="switchGuideMode('text')">📖 텍스트 가이드</div>
+          </div>
+
+          <div class="guide-content">
+            <!-- 음성 가이드 -->
+            <div id="voice-guide-content">
+              <div class="voice-player">
+                <div class="voice-waveform" id="waveform">
+                  <div class="wave-bar" style="height:12px"></div>
+                  <div class="wave-bar" style="height:24px"></div>
+                  <div class="wave-bar" style="height:8px"></div>
+                  <div class="wave-bar" style="height:32px"></div>
+                  <div class="wave-bar" style="height:16px"></div>
+                  <div class="wave-bar" style="height:36px"></div>
+                  <div class="wave-bar" style="height:20px"></div>
+                  <div class="wave-bar" style="height:28px"></div>
+                  <div class="wave-bar" style="height:10px"></div>
+                  <div class="wave-bar" style="height:22px"></div>
+                  <div class="wave-bar" style="height:34px"></div>
+                  <div class="wave-bar" style="height:14px"></div>
+                </div>
+                <button class="voice-play-btn" id="voice-play-btn" onclick="toggleVoice()">▶</button>
+                <div style="color:rgba(255,255,255,0.85);font-size:12px;text-align:center;" id="voice-status">재생 버튼을 눌러 음성 안내를 시작하세요</div>
+              </div>
+              <div class="guide-text-card">
+                <p id="docent-text-ko">"반갑습니다! 저는 천년 신라의 수호자 신라방입니다. 지금 여러분이 서 계신 첨성대는 선덕여왕 632년에 축조된 동양에서 가장 오래된 천문 관측대입니다. 높이 9.17m, 362개의 돌로 쌓인 이 탑은 신라인들이 하늘과 소통하던 신성한 공간이었답니다."</p>
+              </div>
+            </div>
+
+            <!-- 텍스트 가이드 -->
+            <div id="text-guide-content" style="display:none">
+              <div class="guide-text-card">
+                <p id="docent-text-display">"반갑습니다! 저는 천년 신라의 수호자 신라방입니다. 지금 여러분이 서 계신 첨성대는 선덕여왕 632년에 축조된 동양에서 가장 오래된 천문 관측대입니다. 높이 9.17m, 362개의 돌로 쌓인 이 탑은 신라인들이 하늘과 소통하던 신성한 공간이었답니다."</p>
+              </div>
+            </div>
+
+            <!-- 지역 역사 캐릭터 미스터리 박스 -->
+            <div class="mystery-box-section">
+              <h3>📦 경주 역사 캐릭터 아카이브 (재방문 시 랜덤 등장)</h3>
+              <div class="mystery-grid" id="mystery-grid">
+                <div class="mystery-item unlocked" title="선덕여왕">👑</div>
+                <div class="mystery-item unlocked" title="김유신">⚔️</div>
+                <div class="mystery-item unlocked" title="원효대사">📿</div>
+                <div class="mystery-item locked" title="???"></div>
+                <div class="mystery-item locked" title="???"></div>
+                <div class="mystery-item locked" title="???"></div>
+                <div class="mystery-item locked" title="???"></div>
+                <div class="mystery-item locked" title="???"></div>
+              </div>
+              <p style="font-size:11px;color:var(--text-muted);margin-top:8px;">경주를 재방문하면 최대 20개의 역사 캐릭터를 수집할 수 있어요!</p>
+            </div>
+          </div>
+
+          <div class="bottom-nav">
+            <div class="nav-item" onclick="goto('screen-category','left')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>홈</div>
+            <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>탐색</div>
+            <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2a7 7 0 1 1 0 14A7 7 0 0 1 12 2z"/><path d="M12 8v4l3 3"/></svg>도슨트</div>
+            <div class="nav-item" onclick="goto('screen-mypage','right')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>마이</div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────
+             SCREEN 9 : Mission
+        ───────────────────────────────────────── -->
+        <div class="screen" id="screen-mission">
+          <div class="status-bar"><span>16:17</span><div class="status-bar-right">🔋</div></div>
+          <div class="screen-header">
+            <button class="back-btn" onclick="goto('screen-nav','left')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <h2>미션 수행</h2>
+          </div>
+
+          <div class="mission-progress">
+            <h3>신라방 캐릭터 해금 진행률</h3>
+            <div class="progress-bar-outer">
+              <div class="progress-bar-inner" id="mission-bar" style="width:50%"></div>
+            </div>
+            <p id="mission-progress-text">미션 2/4 완료 · 50% 달성</p>
+          </div>
+
+          <div class="mission-list">
+            <div class="mission-item done" id="mission-1">
+              <div class="mission-icon">🏛️</div>
+              <div class="mission-info">
+                <h3>대릉원 인증샷</h3>
+                <p>경주 역사유적지구 내 대릉원 앞에서 사진을 촬영하세요.</p>
+                <div class="mission-action">
+                  <div class="mission-done-badge">✅ 인증 완료!</div>
+                </div>
+              </div>
+            </div>
+            <div class="mission-item done" id="mission-2">
+              <div class="mission-icon">🍙</div>
+              <div class="mission-info">
+                <h3>교리김밥 방문 인증</h3>
+                <p>교리김밥 본점 방문 후 GPS 좌표를 인증하세요.</p>
+                <div class="mission-action">
+                  <div class="mission-done-badge">✅ 인증 완료!</div>
+                </div>
+              </div>
+            </div>
+            <div class="mission-item active" id="mission-3">
+              <div class="mission-icon">🔭</div>
+              <div class="mission-info">
+                <h3>첨성대 인증샷 📍 현재 위치</h3>
+                <p>첨성대 앞에서 사진을 업로드하여 GPS 좌표와 함께 인증하세요.</p>
+                <div class="mission-action">
+                  <button class="mission-upload-btn" id="upload-btn-3" onclick="completeMission(3)">📷 사진 업로드 &amp; 인증</button>
+                </div>
+              </div>
+            </div>
+            <div class="mission-item" id="mission-4">
+              <div class="mission-icon">🌙</div>
+              <div class="mission-info">
+                <h3>동궁과 월지 야경 인증</h3>
+                <p>야간 개장 시간(19:00~23:00)에 방문하여 야경 인증샷을 촬영하세요.</p>
+                <div class="mission-action">
+                  <button class="mission-upload-btn" style="opacity:0.4;cursor:not-allowed;" disabled>🔒 아직 잠금됨</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────
+             SCREEN 10 : Course Complete
+        ───────────────────────────────────────── -->
+        <div class="screen" id="screen-complete">
+          <div class="status-bar"><span>16:17</span><div class="status-bar-right">🔋</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;">
+            <div class="complete-anim">🎉</div>
+            <h2 class="complete-title">코스 완주!</h2>
+            <p class="complete-sub">경주 신라문화제 2박 3일 코스를<br/>성공적으로 완주했어요. 수고하셨어요!</p>
+
+            <div class="reward-card" style="width:100%">
+              <img src="assets/mascot.png" alt="신라방 캐릭터 획득" />
+              <h3>🦁 '신라방' 캐릭터 획득!</h3>
+              <p>마이페이지 캐릭터 컬렉션에 저장되었습니다</p>
+              <div class="badge orange" style="font-size:12px;">경주 도슨트 3/8 수집</div>
+            </div>
+
+            <div style="display:flex;gap:10px;width:100%;margin-top:8px;">
+              <button class="btn-secondary" style="flex:1" onclick="goto('screen-mypage','right')">마이페이지 보기</button>
+              <button class="btn-primary" style="flex:1" onclick="goto('screen-category','left')">🏠 홈으로</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────
+             SCREEN 11 : My Page
+        ───────────────────────────────────────── -->
+        <div class="screen" id="screen-mypage">
+          <div class="status-bar" style="position:absolute;top:0;left:0;right:0;z-index:10;background:transparent;color:#fff">
+            <span>16:17</span><div class="status-bar-right">🔋</div>
+          </div>
+
+          <div class="mypage-header">
+            <div class="avatar-wrap">
+              <div class="avatar">😊</div>
+            </div>
+            <div class="mypage-info">
+              <h2>여행자 김민준</h2>
+              <p>🏯 문화재 취향 · 경주 탐험가</p>
+              <div class="mypage-stats">
+                <div class="mypage-stat"><div class="val">3</div><div class="lbl">완주 코스</div></div>
+                <div class="mypage-stat"><div class="val">12</div><div class="lbl">방문 스폿</div></div>
+                <div class="mypage-stat"><div class="val">3/8</div><div class="lbl">캐릭터 수집</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 캐릭터 컬렉션 -->
+          <div class="mypage-section">
+            <div class="section-header">
+              <h3>🦁 도슨트 캐릭터 수집</h3>
+              <a onclick="showToast('경주 3/8 · 강릉 0/8 · 전주 0/8','orange')">전체 보기</a>
+            </div>
+            <div class="collection-grid">
+              <div class="collect-item unlocked" onclick="showToast('신라방 — 천년 신라의 수호자','success')">
+                <img src="assets/mascot.png" alt="신라방" />
+              </div>
+              <div class="collect-item unlocked" onclick="showToast('선덕여왕 — 신라 27대 여왕','success')">
+                <div style="font-size:32px">👑</div>
+              </div>
+              <div class="collect-item unlocked" onclick="showToast('김유신 — 삼국통일의 영웅','success')">
+                <div style="font-size:32px">⚔️</div>
+              </div>
+              <div class="collect-item locked" onclick="showToast('미션을 완료하면 해금돼요!','warning')">
+                <div style="font-size:32px;filter:blur(5px);opacity:0.3">🏯</div>
+              </div>
+              <div class="collect-item locked"><div style="font-size:32px;filter:blur(5px);opacity:0.3">📿</div></div>
+              <div class="collect-item locked"><div style="font-size:32px;filter:blur(5px);opacity:0.3">🎭</div></div>
+              <div class="collect-item locked"><div style="font-size:32px;filter:blur(5px);opacity:0.3">🏺</div></div>
+              <div class="collect-item locked"><div style="font-size:32px;filter:blur(5px);opacity:0.3">🌸</div></div>
+            </div>
+          </div>
+
+          <!-- 완주 코스 -->
+          <div class="mypage-section" style="padding-top:0">
+            <div class="section-header">
+              <h3>🗺️ 완주한 코스</h3>
+              <a>전체 보기</a>
+            </div>
+            <div class="course-card" onclick="goto('screen-course','right')">
+              <div class="course-icon">🏯</div>
+              <div class="course-info">
+                <h4>경주 신라문화제 2박 3일</h4>
+                <p>2025.10.02 ~ 10.04 · 스폿 4곳</p>
+              </div>
+              <div class="course-badge"><span class="badge orange">완주</span></div>
+            </div>
+            <div class="course-card">
+              <div class="course-icon">🌸</div>
+              <div class="course-info">
+                <h4>경주 벚꽃 당일치기</h4>
+                <p>2025.04.01 · 스폿 3곳</p>
+              </div>
+              <div class="course-badge"><span class="badge green">완주</span></div>
+            </div>
+          </div>
+
+          <!-- 미션 인증 사진 아카이브 -->
+          <div class="mypage-section" style="padding-top:0;padding-bottom:100px;">
+            <div class="section-header"><h3>📸 미션 인증 아카이브</h3></div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+              <div style="aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,#FF8E53,#FFB347);display:flex;align-items:center;justify-content:center;font-size:28px;">🏯</div>
+              <div style="aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,#4CAF50,#8BC34A);display:flex;align-items:center;justify-content:center;font-size:28px;">🍜</div>
+              <div style="aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,#1A1A2E,#334155);display:flex;align-items:center;justify-content:center;font-size:28px;">🌙</div>
+              <div style="aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,#FFB6C1,#FFC0CB);display:flex;align-items:center;justify-content:center;font-size:28px;">🌸</div>
+              <div style="aspect-ratio:1;border-radius:10px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--text-muted);">+</div>
+            </div>
+          </div>
+
+          <div class="bottom-nav">
+            <div class="nav-item" onclick="goto('screen-category','left')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>홈</div>
+            <div class="nav-item" onclick="goto('screen-festival-list','right')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>탐색</div>
+            <div class="nav-item" onclick="goto('screen-workation','right')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>워케이션</div>
+            <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>마이</div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────
+             SCREEN 12 : Workation List
+        ───────────────────────────────────────── -->
+        <div class="screen" id="screen-workation">
+          <div class="status-bar" style="position:absolute;top:0;left:0;right:0;z-index:10;background:transparent;color:#fff">
+            <span>16:17</span><div class="status-bar-right">🔋</div>
+          </div>
+          <div class="work-header">
+            <h1>워케이션 매칭</h1>
+            <p>NLP AI가 나에게 딱 맞는 축제 현장 일자리를 연결해요</p>
+          </div>
+
+          <div class="work-filter-row">
+            <div class="chip selected" onclick="this.classList.toggle('selected')">전체</div>
+            <div class="chip" onclick="this.classList.toggle('selected')">📍 경주</div>
+            <div class="chip" onclick="this.classList.toggle('selected')">📍 강릉</div>
+            <div class="chip" onclick="this.classList.toggle('selected')">📍 전주</div>
+            <div class="chip" onclick="this.classList.toggle('selected')">SNS·콘텐츠</div>
+            <div class="chip" onclick="this.classList.toggle('selected')">운영·스태프</div>
+          </div>
+
+          <div style="padding:16px 20px 0;flex:1;overflow-y:auto;" class="festival-scroll-area">
+            <!-- 공고 1 -->
+            <div class="work-item" onclick="goto('screen-work-detail','right')">
+              <div class="work-item-header">
+                <div class="work-company-icon">🏛️</div>
+                <div>
+                  <h3>신라문화제 SNS 콘텐츠 스태프</h3>
+                  <p>경주시청 관광과 · 경주시</p>
+                </div>
+                <span class="badge orange" style="margin-left:auto">AI 제안 🤖</span>
+              </div>
+              <div class="work-item-body">
+                <div class="work-tags">
+                  <span class="badge blue">SNS 촬영</span>
+                  <span class="badge gray">릴스 편집</span>
+                  <span class="badge gray">한국어 가능</span>
+                </div>
+                <div class="work-meta-row">
+                  <div class="work-pay">일 120,000원</div>
+                  <div class="work-period">10.02 ~ 10.06 (5일)</div>
+                </div>
+                <div class="work-match-row">
+                  <div class="ai-match-label">AI 매칭</div>
+                  <div class="ai-match-bar"><div class="ai-match-fill" style="width:94%"></div></div>
+                  <div class="ai-match-pct">94%</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 공고 2 -->
+            <div class="work-item" onclick="goto('screen-work-detail','right')">
+              <div class="work-item-header">
+                <div class="work-company-icon" style="background:linear-gradient(135deg,#1E293B,#334155)">🎭</div>
+                <div>
+                  <h3>신라문화제 행사 운영 스태프</h3>
+                  <p>경주문화재단 · 경주시</p>
+                </div>
+              </div>
+              <div class="work-item-body">
+                <div class="work-tags">
+                  <span class="badge blue">안내·접수</span>
+                  <span class="badge gray">야간 근무</span>
+                  <span class="badge gray">유니폼 제공</span>
+                </div>
+                <div class="work-meta-row">
+                  <div class="work-pay">일 90,000원</div>
+                  <div class="work-period">10.02 ~ 10.06</div>
+                </div>
+                <div class="work-match-row">
+                  <div class="ai-match-label">AI 매칭</div>
+                  <div class="ai-match-bar"><div class="ai-match-fill" style="width:82%"></div></div>
+                  <div class="ai-match-pct">82%</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 공고 3 -->
+            <div class="work-item" style="margin-bottom:100px;" onclick="goto('screen-work-detail','right')">
+              <div class="work-item-header">
+                <div class="work-company-icon" style="background:linear-gradient(135deg,#0F766E,#14B8A6)">🌿</div>
+                <div>
+                  <h3>강릉 커피축제 바리스타 보조</h3>
+                  <p>강릉시 관광진흥과 · 강릉시</p>
+                </div>
+              </div>
+              <div class="work-item-body">
+                <div class="work-tags">
+                  <span class="badge blue">카페 운영</span>
+                  <span class="badge gray">바리스타</span>
+                  <span class="badge green">숙박 제공</span>
+                </div>
+                <div class="work-meta-row">
+                  <div class="work-pay">일 100,000원</div>
+                  <div class="work-period">10.10 ~ 10.14</div>
+                </div>
+                <div class="work-match-row">
+                  <div class="ai-match-label">AI 매칭</div>
+                  <div class="ai-match-bar"><div class="ai-match-fill" style="width:75%"></div></div>
+                  <div class="ai-match-pct">75%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bottom-nav">
+            <div class="nav-item" onclick="goto('screen-category','left')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>홈</div>
+            <div class="nav-item" onclick="goto('screen-festival-list','right')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>탐색</div>
+            <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>워케이션</div>
+            <div class="nav-item" onclick="goto('screen-mypage','right')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>마이</div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────
+             SCREEN 13 : Workation Job Detail
+        ───────────────────────────────────────── -->
+        <div class="screen" id="screen-work-detail">
+          <div class="status-bar" style="position:absolute;top:0;left:0;right:0;z-index:10;background:transparent;color:#fff">
+            <button class="back-btn" style="background:rgba(255,255,255,0.15);" onclick="goto('screen-workation','left')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <span style="font-size:12px;font-weight:600;">공고 상세</span>
+            <span>🔋</span>
+          </div>
+
+          <div class="work-detail-hero">
+            <h1>신라문화제<br/>SNS 콘텐츠 스태프</h1>
+            <div class="work-detail-meta">
+              <span class="badge orange">경주시청 관광과</span>
+              <span class="badge green">AI 매칭 94%</span>
+            </div>
+          </div>
+
+          <div class="work-detail-body">
+            <div class="ai-propose-banner">
+              <div class="propose-icon">🤖</div>
+              <div>
+                <h3>AI 제안이 도착했어요!</h3>
+                <p>경주시청 관광과 담당자가 회원님께 먼저 제안을 보냈습니다.</p>
+              </div>
+            </div>
+
+            <div class="work-section">
+              <h3>📋 공고 정보</h3>
+              <div class="work-info-row"><div class="key">근무 기간</div><div class="val">2025.10.02 ~ 10.06 (5일)</div></div>
+              <div class="work-info-row"><div class="key">근무 시간</div><div class="val">10:00 ~ 22:00 (중 6시간)</div></div>
+              <div class="work-info-row"><div class="key">일 급여</div><div class="val" style="color:var(--primary);font-weight:800;">120,000원</div></div>
+              <div class="work-info-row"><div class="key">총 급여</div><div class="val">600,000원</div></div>
+              <div class="work-info-row"><div class="key">숙박</div><div class="val">경주 게스트하우스 제공</div></div>
+              <div class="work-info-row"><div class="key">식사</div><div class="val">중식 1회 제공</div></div>
+            </div>
+
+            <div class="work-section">
+              <h3>✅ 주요 업무</h3>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;gap:8px;align-items:flex-start;font-size:13px;"><span>•</span><span>신라문화제 현장 사진·영상 촬영 및 편집</span></div>
+                <div style="display:flex;gap:8px;align-items:flex-start;font-size:13px;"><span>•</span><span>인스타그램·틱톡 릴스 업로드 (즉시 업로드)</span></div>
+                <div style="display:flex;gap:8px;align-items:flex-start;font-size:13px;"><span>•</span><span>관광객 인터뷰 및 축제 분위기 콘텐츠 생성</span></div>
+                <div style="display:flex;gap:8px;align-items:flex-start;font-size:13px;"><span>•</span><span>야경 타임랩스 촬영 (동궁과 월지)</span></div>
+              </div>
+            </div>
+
+            <div class="work-section">
+              <h3>🎯 자격 요건</h3>
+              <div class="option-row">
+                <span class="badge blue">스마트폰 영상 편집</span>
+                <span class="badge gray">SNS 계정 보유</span>
+                <span class="badge gray">한국어 의사소통</span>
+                <span class="badge green">경주 이동 가능</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="work-apply-footer">
+            <button class="btn-secondary" style="flex:1" onclick="showToast('공고가 스크랩되었습니다 ⭐','success')">⭐ 스크랩</button>
+            <button class="btn-primary" style="flex:1" onclick="applyJob()">✅ AI 제안 수락</button>
+          </div>
+        </div>
+
+      </div><!-- /phone-screen -->
+    </div><!-- /phone-device -->
+  </div><!-- /phone-wrap -->
+
+  <!-- ════════════════════════════════════
+       SIMULATOR CONTROL PANEL
+  ════════════════════════════════════ -->
+  <div class="simulator-panel">
+    <div class="sim-title">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      시뮬레이터 패널
+    </div>
+
+    <!-- 현재 화면 -->
+    <div class="sim-card">
+      <h4>📱 현재 화면</h4>
+      <p id="current-screen-label" style="font-size:13px;font-weight:700;color:var(--primary);">스플래시 화면</p>
+      <div class="sim-label">여정 바로가기</div>
+      <button class="sim-btn outline" onclick="goto('screen-category','right')">🏯 관광객 여정 시작</button>
+      <button class="sim-btn outline" onclick="goto('screen-workation','right')">💼 워케이션 여정 시작</button>
+      <button class="sim-btn outline" onclick="goto('screen-mypage','right')">👤 마이페이지</button>
+    </div>
+
+    <!-- GPS 시뮬레이터 -->
+    <div class="sim-card">
+      <h4>📍 GPS 시뮬레이터</h4>
+      <p>GPS 위치 이벤트를 시뮬레이션하여 내비게이션 반응을 테스트합니다.</p>
+      <div class="sim-flow-indicator" id="sim-gps-dots">
+        <div class="sim-dot done" title="경주 역사유적"></div>
+        <div class="sim-dot done" title="교리김밥"></div>
+        <div class="sim-dot active" title="첨성대"></div>
+        <div class="sim-dot" title="동궁과 월지"></div>
+      </div>
+      <button class="sim-btn" onclick="simulateArrival()">📍 거점 도착 시뮬레이션</button>
+      <button class="sim-btn outline" onclick="goto('screen-nav','right')">🗺️ 내비게이션 화면으로</button>
+    </div>
+
+    <!-- 미션 시뮬레이터 -->
+    <div class="sim-card">
+      <h4>🎯 미션 시뮬레이터</h4>
+      <p>사진 업로드 및 미션 완료 이벤트를 발생시킵니다.</p>
+      <button class="sim-btn green" onclick="completeMission(3)">📷 첨성대 미션 완료</button>
+      <button class="sim-btn green" onclick="completeMission(4);setTimeout(()=>triggerCourseComplete(),800)">🌙 야경 미션 완료 + 코스 완주</button>
+      <button class="sim-btn outline" onclick="goto('screen-mission','right')">📋 미션 화면으로</button>
+    </div>
+
+    <!-- AI 매칭 시뮬레이터 -->
+    <div class="sim-card">
+      <h4>🤖 AI 제안 알림</h4>
+      <p>구인 담당자가 AI를 통해 지원자에게 먼저 제안을 보내는 시나리오입니다.</p>
+      <button class="sim-btn" onclick="triggerAIProposal()">📨 AI 제안 수신 시뮬레이션</button>
+      <button class="sim-btn outline" onclick="goto('screen-work-detail','right')">📄 공고 상세 보기</button>
+    </div>
+
+    <!-- 도슨트 -->
+    <div class="sim-card">
+      <h4>🦁 도슨트 캐릭터</h4>
+      <p>미션 완료에 따라 캐릭터가 선명해지는 효과를 테스트합니다.</p>
+      <button class="sim-btn" onclick="goto('screen-docent','right');setTimeout(clearDocent,400)">🔲 흐린 상태 (시작)</button>
+      <button class="sim-btn outline" onclick="goto('screen-docent','right');setTimeout(sharpDocent,400)">✨ 선명한 상태 (미션 후)</button>
+    </div>
+  </div>
+
+</div><!-- /simulator-shell -->
+
+<script src="app.js"></script>
+</body>
+</html>
