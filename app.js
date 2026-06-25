@@ -13,6 +13,43 @@ const state = {
   missionsDone: [true, true, false, false],
   gpsStep: 2, // 0-indexed; currently at index 2 (첨성대)
   courseCompleted: false,
+  seekerProfile: {
+    regions: ['경주'],
+    skills: ['SNS 촬영', '영상 편집'],
+    minPay: 10
+  },
+  jobs: [
+    {
+      id: 'job-1',
+      title: '신라문화제 SNS 콘텐츠 스태프',
+      company: '경주시청 관광과 · 경주시',
+      icon: '🏛️',
+      pay: 120000,
+      period: '10.02 ~ 10.06 (5일)',
+      skills: ['SNS 촬영', '영상 편집', '한국어 가능'],
+      region: '경주'
+    },
+    {
+      id: 'job-2',
+      title: '신라문화제 행사 운영 스태프',
+      company: '경주문화재단 · 경주시',
+      icon: '🎭',
+      pay: 90000,
+      period: '10.02 ~ 10.06',
+      skills: ['안내·접수', '야간 근무', '유니폼 제공'],
+      region: '경주'
+    },
+    {
+      id: 'job-3',
+      title: '강릉 커피축제 바리스타 보조',
+      company: '강릉시 관광진흥과 · 강릉시',
+      icon: '🌿',
+      pay: 100000,
+      period: '10.10 ~ 10.14',
+      skills: ['카페 운영', '바리스타', '숙박 제공'],
+      region: '강릉'
+    }
+  ]
 };
 
 // ── Screen Labels ────────────────────────────────────────
@@ -30,6 +67,9 @@ const screenLabels = {
   'screen-mission':       '미션 수행',
   'screen-complete':      '코스 완주 🎉',
   'screen-mypage':        '마이페이지',
+  'screen-work-recruiter-post': '구인 공고 등록 (구인자)',
+  'screen-work-seeker-conditions': '워케이션 조건 설정 (구직자)',
+  'screen-work-matching-loading': '상호 AI 매칭 중...',
   'screen-workation':     '워케이션 공고 목록',
   'screen-work-detail':   '워케이션 공고 상세',
 };
@@ -450,6 +490,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial simulator label
   const label = document.getElementById('current-screen-label');
   if (label) label.textContent = screenLabels['screen-splash'];
+
+  // Initial workation list render
+  renderWorkationList();
 });
 
 // ── Onboarding Slide Control ─────────────────────────────
@@ -611,4 +654,271 @@ function confirmRegionGo() {
   }
 
   goto('screen-region', 'right');
+}
+
+// ── Workation Recruiter/Seeker/Matching Logic ────────────
+function postRecruiterJob() {
+  const title = document.getElementById('recruiter-title').value.trim();
+  const festival = document.getElementById('recruiter-festival').value.trim();
+  const regionSelect = document.getElementById('recruiter-region');
+  const region = regionSelect ? regionSelect.value : '경주';
+  const payInput = document.getElementById('recruiter-pay');
+  const payVal = payInput && payInput.value ? parseInt(payInput.value) : 120000;
+  
+  if (!title || !festival) {
+    showToast('⚠️ 공고 제목과 축제명을 입력해 주세요', 'warning');
+    return;
+  }
+  
+  const skills = [];
+  document.querySelectorAll('#screen-work-recruiter-post .recruiter-skills-grid .chip.selected').forEach(chip => {
+    skills.push(chip.dataset.skill);
+  });
+  
+  const newJob = {
+    id: 'custom-job-' + Date.now(),
+    title: title,
+    company: festival + ' 기획단 · ' + region + '시',
+    icon: '🏛️',
+    pay: payVal,
+    period: '10.02 ~ 10.06 (5일)',
+    skills: skills.length > 0 ? skills : ['SNS 촬영', '고객 응대'],
+    region: region,
+    custom: true
+  };
+  
+  state.jobs.unshift(newJob);
+  
+  showToast('✅ 구인 공고가 등록되었습니다! 구직자 매칭을 시작합니다.', 'success');
+  
+  // Clear inputs
+  document.getElementById('recruiter-title').value = '';
+  document.getElementById('recruiter-festival').value = '';
+  if (payInput) payInput.value = '';
+  document.querySelectorAll('#screen-work-recruiter-post .recruiter-skills-grid .chip').forEach(chip => {
+    chip.classList.remove('selected');
+  });
+  
+  setTimeout(() => goto('screen-work-seeker-conditions', 'right'), 1200);
+}
+
+function startMutualMatching() {
+  const regions = [];
+  document.querySelectorAll('#seeker-regions-row .chip.selected').forEach(chip => {
+    regions.push(chip.dataset.region);
+  });
+  
+  const skills = [];
+  document.querySelectorAll('#seeker-skills-row .chip.selected').forEach(chip => {
+    skills.push(chip.dataset.skill);
+  });
+  
+  const selectedPayBtn = document.querySelector('#seeker-pay-row .option-btn.selected');
+  const minPay = selectedPayBtn ? parseInt(selectedPayBtn.dataset.val) : 10;
+  
+  if (regions.length === 0) {
+    showToast('⚠️ 희망 근무 지역을 최소 1개 선택해 주세요', 'warning');
+    return;
+  }
+  
+  state.seekerProfile = {
+    regions: regions,
+    skills: skills,
+    minPay: minPay
+  };
+  
+  goto('screen-work-matching-loading', 'right');
+  
+  const checkSteps = [
+    { id: 'check-step-1', bullet: 'bullet-1', text: '희망 근무 조건 분석 완료 ✅' },
+    { id: 'check-step-2', bullet: 'bullet-2', text: '등록된 구인 공고 역량 매칭 완료 ✅' },
+    { id: 'check-step-3', bullet: 'bullet-3', text: '상호 최적 적합도 산출 완료 ✅' }
+  ];
+  
+  // Reset loading UI
+  for (let i = 1; i <= 3; i++) {
+    const stepEl = document.getElementById(`check-step-${i}`);
+    const bulletEl = document.getElementById(`bullet-${i}`);
+    if (stepEl) {
+      stepEl.className = 'check-item';
+      const textSpan = stepEl.querySelector('span:last-child');
+      if (textSpan) {
+        textSpan.textContent = i === 1 ? '희망 근무 조건 분석 중...' : i === 2 ? '등록된 구인 공고 역량 매칭 중...' : '상호 최적 적합도 산출 중...';
+      }
+    }
+    if (bulletEl) {
+      bulletEl.className = 'check-bullet';
+      bulletEl.textContent = i;
+    }
+  }
+  
+  // Activate step 1
+  setTimeout(() => {
+    activateCheckStep(1, checkSteps[0]);
+  }, 600);
+  
+  // Activate step 2
+  setTimeout(() => {
+    activateCheckStep(2, checkSteps[1]);
+  }, 1200);
+  
+  // Activate step 3
+  setTimeout(() => {
+    activateCheckStep(3, checkSteps[2]);
+  }, 1800);
+  
+  // Done
+  setTimeout(() => {
+    renderWorkationList();
+    goto('screen-workation', 'right');
+    showToast('🤖 AI 분석 결과, 맞춤 워케이션 추천이 완료되었습니다!', 'success');
+  }, 2500);
+}
+
+function activateCheckStep(num, stepData) {
+  const stepEl = document.getElementById(stepData.id);
+  const bulletEl = document.getElementById(stepData.bullet);
+  if (stepEl) {
+    stepEl.classList.add('active-step');
+    const textSpan = stepEl.querySelector('span:last-child');
+    if (textSpan) textSpan.textContent = stepData.text;
+  }
+  if (bulletEl) {
+    bulletEl.classList.add('done');
+    bulletEl.textContent = '✓';
+  }
+  if (num < 3) {
+    const nextBullet = document.getElementById(`bullet-${num + 1}`);
+    if (nextBullet) nextBullet.classList.add('active-bullet');
+  }
+}
+
+function calculateMatchRate(job, seeker) {
+  let score = 50;
+  
+  if (seeker.regions.includes(job.region)) {
+    score += 30;
+  }
+  
+  if (job.skills && job.skills.length > 0) {
+    let matchedSkills = 0;
+    job.skills.forEach(s => {
+      if (seeker.skills.some(ss => s.includes(ss) || ss.includes(s))) {
+        matchedSkills++;
+      }
+    });
+    const matchRatio = matchedSkills / job.skills.length;
+    score += Math.round(matchRatio * 20);
+  }
+  
+  const jobPay10k = job.pay / 10000;
+  if (jobPay10k >= seeker.minPay) {
+    score += 8;
+  } else {
+    score -= 5;
+  }
+  
+  return Math.max(50, Math.min(98, score));
+}
+
+function renderWorkationList() {
+  const container = document.querySelector('#screen-workation .festival-scroll-area');
+  if (!container) return;
+  
+  container.innerHTML = '';
+  
+  const seeker = state.seekerProfile || { regions: ['경주'], skills: ['SNS 촬영', '영상 편집'], minPay: 10 };
+  
+  const scoredJobs = state.jobs.map(job => {
+    return {
+      ...job,
+      matchRate: calculateMatchRate(job, seeker)
+    };
+  });
+  
+  scoredJobs.sort((a, b) => b.matchRate - a.matchRate);
+  
+  scoredJobs.forEach((job, index) => {
+    const item = document.createElement('div');
+    item.className = 'work-item';
+    if (job.custom) {
+      item.style.border = '2px solid var(--primary)';
+    }
+    item.onclick = () => showWorkDetail(job.id);
+    
+    const skillsHtml = job.skills.map((s, idx) => {
+      const badgeClass = idx === 0 ? 'blue' : 'gray';
+      return `<span class="badge ${badgeClass}">${s}</span>`;
+    }).join('');
+    
+    const isCustomBadge = job.custom ? `<span class="badge orange" style="margin-left:auto">내가 올린 공고 🏛️</span>` : (index === 0 ? `<span class="badge orange" style="margin-left:auto">AI 제안 🤖</span>` : '');
+    
+    item.innerHTML = `
+      <div class="work-item-header">
+        <div class="work-company-icon">${job.icon}</div>
+        <div>
+          <h3 style="font-size: 14px; font-weight: 700; color: var(--text-main);">${job.title}</h3>
+          <p style="font-size: 11px; color: var(--text-sub); margin-top: 2px;">${job.company}</p>
+        </div>
+        ${isCustomBadge}
+      </div>
+      <div class="work-item-body" style="padding: 12px 16px;">
+        <div class="work-tags" style="display: flex; gap: 4px; margin-bottom: 8px;">
+          ${skillsHtml}
+        </div>
+        <div class="work-meta-row" style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px;">
+          <div class="work-pay" style="font-weight: 700; color: var(--primary);">일 ${job.pay.toLocaleString()}원</div>
+          <div class="work-period" style="color: var(--text-sub);">${job.period}</div>
+        </div>
+        <div class="work-match-row" style="display: flex; align-items: center; gap: 8px;">
+          <div class="ai-match-label" style="font-size: 10px; font-weight: 700; color: var(--primary);">AI 매칭</div>
+          <div class="ai-match-bar" style="flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;"><div class="ai-match-fill" style="width:${job.matchRate}%; height: 100%; background: var(--primary);"></div></div>
+          <div class="ai-match-pct" style="font-size: 10px; font-weight: 700; color: var(--primary);">${job.matchRate}%</div>
+        </div>
+      </div>
+    `;
+    
+    container.appendChild(item);
+  });
+  
+  if (container.lastElementChild) {
+    container.lastElementChild.style.marginBottom = '100px';
+  }
+}
+
+function showWorkDetail(jobId) {
+  const job = state.jobs.find(j => j.id === jobId);
+  if (!job) return;
+  
+  const heroTitle = document.querySelector('#screen-work-detail .work-detail-hero h1');
+  const heroCompany = document.querySelector('#screen-work-detail .work-detail-meta span.orange');
+  const heroMatch = document.querySelector('#screen-work-detail .work-detail-meta span.green');
+  const detailPeriod = document.querySelector('#screen-work-detail .work-section div.work-info-row:nth-child(2) div.val');
+  const detailPay = document.querySelector('#screen-work-detail .work-section div.work-info-row:nth-child(4) div.val');
+  const detailTotalPay = document.querySelector('#screen-work-detail .work-section div.work-info-row:nth-child(5) div.val');
+  
+  if (heroTitle) heroTitle.innerHTML = job.title.replace(' ', '<br/>');
+  if (heroCompany) heroCompany.textContent = job.company.split(' · ')[0];
+  
+  const seeker = state.seekerProfile || { regions: ['경주'], skills: ['SNS 촬영', '영상 편집'], minPay: 10 };
+  const rate = calculateMatchRate(job, seeker);
+  if (heroMatch) heroMatch.textContent = `AI 매칭 ${rate}%`;
+  
+  if (detailPeriod) detailPeriod.textContent = job.period;
+  if (detailPay) detailPay.textContent = `${job.pay.toLocaleString()}원`;
+  if (detailTotalPay) {
+    const days = job.period.includes('5일') ? 5 : 3;
+    detailTotalPay.textContent = `${(job.pay * days).toLocaleString()}원`;
+  }
+  
+  const tagsRow = document.querySelector('#screen-work-detail .work-section:nth-of-type(3) .option-row');
+  if (tagsRow) {
+    tagsRow.innerHTML = job.skills.map((s, idx) => {
+      const badgeClass = idx === 0 ? 'blue' : (idx === 1 ? 'gray' : 'green');
+      return `<span class="badge ${badgeClass}">${s}</span>`;
+    }).join('');
+  }
+  
+  state.selectedJob = job;
+  goto('screen-work-detail', 'right');
 }
